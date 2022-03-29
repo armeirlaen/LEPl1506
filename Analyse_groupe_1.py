@@ -20,6 +20,8 @@ Partie du code sur les fichier CODA
 
 marker_manipulandum = [5,6,7,8] #les markers utilisés sur le manipulandum
 
+
+pathToFolder = "C:/Users/arthu/Documents/Résultats_Labo_0803/"
 strpath = "GBIO_2022_Group_1_"
 strpathbis = "_20220008_0"
 strpath1= "Bloc_"
@@ -50,9 +52,9 @@ def plotX(Sujet,Orientation):
     for i in num:
         k+=1
         if i<10:
-            pat="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1_CODA/"+strpath+Sujet+strpathbis+"0"+str(i)+".TXT"
+            pat=pathToFolder+"Groupe 1_CODA/"+strpath+Sujet+strpathbis+"0"+str(i)+".TXT"
         else:
-            pat="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1_CODA/"+strpath+Sujet+strpathbis+str(i)+".TXT"
+            pat=pathToFolder+"Groupe 1_CODA/"+strpath+Sujet+strpathbis+str(i)+".TXT"
         x,y,z = printCoord(pat)
         plt.subplot(6,1,k)
         time=np.linspace(0,51,len(x))
@@ -69,9 +71,9 @@ def plotY(Sujet,Orientation):
     for i in num:
         k+=1
         if i<10:
-            pat="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1_CODA/"+strpath+Sujet+strpathbis+"0"+str(i)+".TXT"
+            pat=pathToFolder+"Groupe 1_CODA/"+strpath+Sujet+strpathbis+"0"+str(i)+".TXT"
         else:
-            pat="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1_CODA/"+strpath+Sujet+strpathbis+str(i)+".TXT"
+            pat=pathToFolder+"Groupe 1_CODA/"+strpath+Sujet+strpathbis+str(i)+".TXT"
         x,y,z = printCoord(pat)
         plt.subplot(6,1,k)
         time=np.linspace(0,51,len(y))
@@ -84,8 +86,6 @@ def plotY(Sujet,Orientation):
 Partie du code sur les fichier du manipulandum(.glm)
 """
 
-file = "C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1/Bloc_S1_006.glm"
-baseline = [0,1,2]
 
 glm_df = glm.import_data(file)
 
@@ -105,9 +105,9 @@ def plotGF(Sujet,Orientation):
     for i in num:
         k+=1
         if i<10:
-            path="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
         else:
-            path="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
         curr_df = glm.import_data(path)
         t,LFi,GFi= printForce(curr_df)
         #plt.subplot(6,1,k)
@@ -124,9 +124,9 @@ def plotLF(Sujet,Orientation):
     for i in num:
         k+=1
         if i<10:
-            path="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
         else:
-            path="C:/Users/arthu/Documents/Résultats_Labo_0803/Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
         curr_df = glm.import_data(path)
         t,LFi,GFi= printForce(curr_df)
         #plt.subplot(6,1,k)
