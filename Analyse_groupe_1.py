@@ -87,7 +87,7 @@ Partie du code sur les fichier du manipulandum(.glm)
 """
 
 
-glm_df = glm.import_data(file)
+#glm_df = glm.import_data(file)
 
 
 def printForce(df):
@@ -136,6 +136,24 @@ def plotLF(Sujet,Orientation):
 
     plt.show()
 
+def plotLFGF(Sujet,Orientation):
+    num = Sujets[Sujet][Orientation][1]
+    #PLot LF
+    k=0
+    for i in num:
+        k+=1
+        if i<10:
+            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
+        else:
+            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
+        curr_df = glm.import_data(path)
+        t,LFi,GFi= printForce(curr_df)
+        plt.subplot(6,1,k)
+        plt.plot(GFi,LFi,label=str(k))
+        plt.legend()
+        plt.title("LF:00"+str(k))
+
+    plt.show()
 
 
 plotY("S1","A l'endroit")
