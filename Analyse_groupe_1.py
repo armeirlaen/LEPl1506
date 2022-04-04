@@ -12,6 +12,7 @@ import signal_processing_toolbox as sig
 import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
+import math as math
 
 
 """
@@ -101,51 +102,53 @@ def printForce(df):
 def plotGF(Sujet,Orientation):
     num = Sujets[Sujet][Orientation][1]
     #Plot GF
-    k=0
-    for i in num:
-        k+=1
+    for i in range(1,13):
         if i<10:
-            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+"Bloc_"+Sujet+"_00"+str(i)+".glm"
         else:
-            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+"Bloc_"+Sujet+"_0"+str(i)+".glm"
         curr_df = glm.import_data(path)
         t,LFi,GFi= printForce(curr_df)
+        exp = np.polyfit(t, np.log(GFi), 1, w=np.sqrt(GFi))
         #plt.subplot(6,1,k)
-        plt.plot(t,GFi,label=str(k))
+        plt.plot(t,exp)
+        plt.plot(t,GFi,label=str(i))
         plt.legend(loc="upper left")
         #plt.title("GF:00"+str(i))
 
     plt.show()
 
 def plotLF(Sujet,Orientation):
-    num = Sujets[Sujet][Orientation][1]
     #PLot LF
-    k=0
-    for i in num:
-        k+=1
+    for i in range(5,7):
         if i<10:
-            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+"Bloc_"+Sujet+"_00"+str(i)+".glm"
         else:
-            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+"Bloc_"+Sujet+"_0"+str(i)+".glm"
         curr_df = glm.import_data(path)
         t,LFi,GFi= printForce(curr_df)
+        ex = np.polyfit(t, np.log(LFi), 1, w=np.sqrt(LFi))
         #plt.subplot(6,1,k)
-        plt.plot(t,LFi,label=str(k))
+        expPlot = GFi
+        j=0
+        for x in t:
+            expPlot[j] = math.exp(ex[0]) * math.exp(ex[0]*x)
+            j+=1
+        plt.plot(t,expPlot)
+        plt.plot(t,LFi,label=str(i))
+        
         plt.legend()
         #plt.title("LF:00"+str(i))
 
     plt.show()
 
 def plotLFGF(Sujet,Orientation):
-    num = Sujets[Sujet][Orientation][1]
     #PLot LF
-    k=0
-    for i in num:
-        k+=1
+    for i in range(1,13):
         if i<10:
-            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+"0"+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+Sujet+"_00"+str(i)+".glm"
         else:
-            path=pathToFolder+"Groupe 1/"+strpath1+Sujet+strpath1bis+str(i)+".glm"
+            path=pathToFolder+"Groupe 1/"+Sujet+"_0"+str(i)+".glm"
         curr_df = glm.import_data(path)
         t,LFi,GFi= printForce(curr_df)
         plt.subplot(6,1,k)
@@ -155,13 +158,13 @@ def plotLFGF(Sujet,Orientation):
 
     plt.show()
 
+    
+    
 
-plotY("S1","A l'endroit")
-#plotX("S1")
-plotGF("S1","A l'endroit")
-#plotLF("S1")
+#plotY("S1","A l'endroit")
+plotLF("S1","A l'endroit")
 
 
-CPL,CPR = glm.compute_cop(glm_df,baseline)
+#CPL,CPR = glm.compute_cop(glm_df,baseline)
 
-print("CPL",CPL)
+#print("CPL",CPL)
