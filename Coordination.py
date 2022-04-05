@@ -9,85 +9,77 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-
-path = "Groupe 1_CODA/"
-filenames = os.listdir(path)
-File = 14
-
-marker_manipulandum = [4,5,6,7] #les markers utilisés sur le manipulandum
-
-strpath = "GBIO_2022_Group_1_S1_20220008_0"
-strpath1= "Bloc_S1_0"
-num = [11]
-
-for i in num:
-    if i<10:
-        path="Groupe 1/"+strpath1+"0"+str(i)+".glm"
-    else:
-        path="Groupe 1/"+strpath1+str(i)+".glm"
-    curr_df = glm.import_data(path)
-
+FS_coda =200
+FS_glm = 800
 def find_end(timec,timem,ac,am):
+    
     maxc = np.max(ac)
     idxc = np.where(ac == maxc)
-    maxm = np.max(am)
-    idxm = np.where(am == maxm)
+    
+    maxm = np.max(am[30000:])
+    idxm = np.where(am[30000:] == maxm)
     #print(idxc,maxc,idxm,maxm)
-    endc = float(timec[idxc[0]])
-    endm = float(timem[idxm[0]])
+    if len(idxc[0]) == 1:
+        endc = float(timec[idxc[0]])
+        endm = float(timem[idxm[0]+30000])
+    else :
+        endc = float(timec[idxc[0][0]])
+        endm = float(timem[idxm[0]+30000])
     
-    delta = round(endc - endm,6)
-    print(len(timem))
-    print(timem)
-    add = np.where(timem == delta)
-    zero = np.zeros(add[0])
-    newam = np.concatenate((zero,am))
-    newtimem = np.linspace(0,timem[len(timem)-1]+delta,num=len(newam))
+    delta = round(endc - endm,6) #besoin de rajouter -0,001 pour S5 car jsp pq time commence pas a 0
+    #print(endc,endm)
+    if delta > 0:
+        add = np.where(timem == delta)
+        zero = np.zeros(add[0])
+        newam = np.concatenate((zero,am))
+        newtimem = np.linspace(0,timem[len(timem)-1]+delta,num=len(newam))
+    else :
+        suppr = np.where(timem == abs(delta))
+        list_suppr = np.arange(0,suppr[0])
+        newam = np.delete(am,list_suppr)
+        newtimem = np.linspace(0,timem[len(timem)-1]+delta,num=len(newam))
     
-    
-    
+        #newtimec = np.linspace(0,(timec[0]-timec[-1]),len(timec))
     return(timec,newtimem,ac,newam)
 
-def supprNan(time,mc):
+def supprNan(mc):
     i = 0
-    start = True
-    suppr = []
+    
+    if np.isnan(mc[i]):
+            mc[i] = 0
+            i+=1
     while i < len(mc):
         #print(mc[0])
-        while np.isnan(mc[i]) & start:
-            suppr.append(i)
-            i+=1
-        start = False
         if np.isnan(mc[i]):
             mc[i] = mc[i-1]
         i+=1
    
-    newmc = np.delete(mc,suppr)
-    newtime = time.drop(suppr)
-    return(newtime,newmc)
+    #newmc = np.delete(mc,suppr)
+    #newtime = time.drop(suppr)
+    #return(newtime,newmc)
 
-df = coda.import_data('Groupe 1_CODA/' + filenames[File-1])  #on import les données
-mc = coda.manipulandum_center(df, markers_id = marker_manipulandum ) #on calcule les coordonnées du centre du manipulandum
-timec = df.time
-FS_coda =200
-FS_glm = 800
 
-def plot_acc(glm,mc,timec):
+
+def plot_acc(glm,mc,timec,k,path):
     
     Pcoda = sig.filter_signal(mc[1])
-    dx = timec[1]-timec[0]
     timem = glm.time
-    ax = sig.filter_signal(glm['LowAcc_X'])
-    ay = glm['LowAcc_Y']
-    az = glm['LowAcc_Z']
-    dy= np.zeros(len(Pcoda))
-    ddy = np.zeros(len(Pcoda))
+    am = sig.filter_signal(glm['LowAcc_X'])
+    #ay = glm['LowAcc_Y']
+    #az = glm['LowAcc_Z']
     
+    if k in range(1,7):
+        ac = -1*sig.derive(sig.derive(Pcoda,FS_coda),FS_coda)/10000 # -1 si mani a l'envers Pour S1 à l'endroit
+    else :
+        ac = 1*sig.derive(sig.derive(Pcoda,FS_coda),FS_coda)/10000
+        
+    #POUR S5 1->6
+    #plt.subplot(6,1,k)
+    #plt.plot(timem,am,color = 'red')
+    #plt.plot(timec,ac)
     
-    Acoda = -sig.derive(sig.derive(Pcoda,FS_coda),FS_coda)/10000
-    
-    timec,ac = supprNan(timec,Acoda)
-    timem,am = supprNan(timem,ax)
+    supprNan(ac)
+    supprNan(am)
     
     timec,timem,ac,am = find_end(timec,timem,ac,am)    
     
@@ -99,14 +91,21 @@ def plot_acc(glm,mc,timec):
     plt.subplot(3,1,3)
     plt.plot(timec,ddy)
     """
-    
+    plt.subplot(6,1,k)
     plt.plot(timem,am,color = 'green')
     plt.plot(timec,ac)
     
     
     
-    #plt.plot(time,ay,color = 'red')
-    #plt.plot(time,az)
-    plt.show()
     
-plot_acc(curr_df,mc,timec)
+   
+    if k == 6 :
+        plt.title(path)
+        plt.legend(['Manipulandum','CODA'],loc = 'upper left')
+        plt.show()
+        
+    
+    
+def coordination(df_glm,df_coda,mc,k,path):
+    timec = df_coda.timec
+    plot_acc(df_glm,mc,timec,k,path)

@@ -49,7 +49,7 @@ def import_data(file_path):
 
     return df
  
-    
+
 
 
 def manipulandum_center(coda_df, markers_id=[1,2,3,4]):
