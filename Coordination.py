@@ -7,10 +7,77 @@ import Plot as pl
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.signal import argrelextrema
+
 
 
 FS_coda =200
 FS_glm = 800
+
+
+
+def find_max_loc(vc):
+    threshold = np.max(vc)/7
+    maxi = argrelextrema(vc, np.greater)
+    keep = []
+    #◘print(maxi)
+    for i in maxi[0]:
+        if vc[i] > threshold :
+            keep.append(i)
+            
+    keep = np.array(keep)
+    keep = keep[1:]
+    j = 0
+    while j < len(keep):
+        while (keep[j] - keep[j-1] < 600) & (keep[j] - keep[j-1] >0) & (keep[j]!=0):
+            keep = np.delete(keep,j)
+            keep = np.append(keep,0)   
+        if (j < len(keep)) & (keep[j]!=0):    
+            
+            max = vc[keep[j]]
+            #print('max:',round(max/10,1))
+            arr = vc[keep[j]-100:keep[j]]
+            difference_array = np.absolute(arr-max/10)
+            index = difference_array.argmin()
+            
+            #print(start)
+            idx = index-100+keep[j]
+            keep[j] = idx
+        j+=1
+        
+    keep = keep[0:10]    
+    return keep
+
+def find_min_loc(vc):
+    threshold = np.min(vc)/3
+    maxi = argrelextrema(vc, np.less)
+    keep = []
+    #◘print(maxi)
+    for i in maxi[0]:
+        if vc[i] < threshold :
+            keep.append(i)
+            
+    keep = np.array(keep)
+    
+    j = 0
+    while j < len(keep):
+        if (keep[j] - keep[j-1] < 600) & (keep[j] - keep[j-1] >0):
+            keep = np.delete(keep,j)
+        if j < len(keep):
+            max = vc[keep[j]]
+            #print('max:',round(max/10,1))
+            arr = vc[keep[j]-100:keep[j]]
+            difference_array = np.absolute(arr-max/10)
+            index = difference_array.argmin()
+            
+            #print(start)
+            idx = index-100+keep[j]
+            keep[j] = idx
+            j+=1
+        
+    keep = keep[0:10]
+    return keep
+
 def find_end(timec,timem,ac,am):
     
     maxc = np.max(ac)
@@ -67,11 +134,11 @@ def plot_acc(glm,mc,timec,k,path):
     am = sig.filter_signal(glm['LowAcc_X'])
     #ay = glm['LowAcc_Y']
     #az = glm['LowAcc_Z']
-    
+    Vcoda = sig.derive(Pcoda,FS_coda)
     if k in range(1,7):
-        ac = -1*sig.derive(sig.derive(Pcoda,FS_coda),FS_coda)/10000 # -1 si mani a l'envers Pour S1 à l'endroit
+        ac = -1*sig.derive(Vcoda,FS_coda)/10000 # -1 si mani a l'envers Pour S1 à l'endroit
     else :
-        ac = 1*sig.derive(sig.derive(Pcoda,FS_coda),FS_coda)/10000
+        ac = 1*sig.derive(Vcoda,FS_coda)/10000
         
     #POUR S5 1->6
     #plt.subplot(6,1,k)
@@ -81,7 +148,9 @@ def plot_acc(glm,mc,timec,k,path):
     supprNan(ac)
     supprNan(am)
     
-    timec,timem,ac,am = find_end(timec,timem,ac,am)    
+    timec,timem,ac,am = find_end(timec,timem,ac,am)
+    supprNan(Vcoda)
+    #idxmax,idxmin,bloc = find_mouv(Vcoda) 
     
     """
     plt.subplot(3,1,1)
@@ -92,9 +161,10 @@ def plot_acc(glm,mc,timec,k,path):
     plt.plot(timec,ddy)
     """
     plt.subplot(6,1,k)
-    plt.plot(timem,am,color = 'green')
-    plt.plot(timec,ac)
-    
+   #plt.plot(timem,am,color = 'green')
+    plt.plot(timec,Vcoda)
+    #plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
+    #plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
     
     
     
@@ -104,7 +174,24 @@ def plot_acc(glm,mc,timec,k,path):
         plt.legend(['Manipulandum','CODA'],loc = 'upper left')
         plt.show()
         
-    
+def find_mouv(Vcoda):
+    idxmax = find_max_loc(Vcoda)
+    idxmin = find_min_loc(Vcoda)
+    bloc = np.zeros(idxmax.size + idxmin.size)
+
+    k = 0
+    l = 0
+    for i in range(len(bloc)):
+        if i % 2 == 0:
+            bloc[i] = idxmax[k]
+            k+=1
+        if i % 2 != 0:
+            bloc[i] = idxmin[l]
+            l+=1
+    #plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
+    #plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
+    #print(bloc)
+    return(idxmax,idxmin,bloc)
     
 def coordination(df_glm,df_coda,mc,k,path):
     timec = df_coda.timec
