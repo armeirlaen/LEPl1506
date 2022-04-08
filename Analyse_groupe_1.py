@@ -82,9 +82,15 @@ def averageSens(dfs):
     datadown = data[:,7:]
     meanup= np.mean(dataup,1)
     meandown= np.mean(datadown,1)
+    ax1 = plt.subplot(1,2,1)
     plt.plot(time,meanup,label = 'mean up',color = 'red')
+    plt.plot(time,dataup,color = 'red',alpha = 0.25)
+    plt.title('Average upside')
+    plt.subplot(1,2,2,sharey = ax1)
     plt.plot(time,meandown,label = 'mean down',color = 'green')
-    plt.show()            
+    plt.plot(time,datadown,color = 'green',alpha = 0.25)
+    plt.title('Average downside')
+    plt.show()                        
 
 def averageSensMain(dfs):
     time = dfs['time']
@@ -100,23 +106,45 @@ def averageSensMain(dfs):
     meandownd= np.mean(datadownd,1)
     meanupg = np.mean(dataupg,1)
     meandowng= np.mean(datadowng,1)
-    plt.plot(time,meanupd,label = 'mean up right',color = 'red')
-    plt.plot(time,meandownd,label = 'mean down right',color = 'green')
+    ax1 = plt.subplot(2,2,1)
     plt.plot(time,meanupg,label = 'mean up left',color = 'orange')
+    plt.plot(time,dataupg,color = 'orange',alpha = 0.25)
+    plt.title('Average upside left hand')
+    
+    plt.subplot(2,2,2,sharey = ax1)
+    plt.plot(time,meanupd,label = 'mean up right',color = 'red')
+    plt.plot(time,dataupd,color = 'red',alpha = 0.25)
+    plt.title('Average upside right hand')
+    
+    plt.subplot(2,2,3,sharey = ax1)
     plt.plot(time,meandowng,label = 'mean down left',color = 'blue')
+    plt.plot(time,datadowng,color = 'blue',alpha = 0.25)
+    plt.title('Average downside left hand')
+    
+    
+    plt.subplot(2,2,4,sharey = ax1)
+    plt.plot(time,meandownd,label = 'mean down right',color = 'green')
+    plt.plot(time,datadownd,color = 'green',alpha = 0.25)
+    plt.title('Average downside right hand')
     plt.show()    
 
 def averageMain(dfs):
     time = dfs['time']
     df= dfs.drop(columns = ['time'])
     data = df.values
-    dataup = data[:,:6]
-    datadown = data[:,7:]
-    meanup= np.mean(dataup,1)
-    meandown= np.mean(datadown,1)
-    plt.plot(time,meanup,label = 'mean up',color = 'red')
-    plt.plot(time,meandown,label = 'mean down',color = 'green')
-    plt.show()         
+    datad = data[:,[1,3,5]]
+    datag = data[:,[0,2,4]]
+    meand= np.mean(datad,1)
+    meang= np.mean(datag,1)
+    ax1 = plt.subplot(1,2,1)
+    plt.plot(time,meang,label = 'mean up',color = 'red')
+    plt.plot(time,datag,color = 'red',alpha = 0.25)
+    plt.title('Average left hand')
+    plt.subplot(1,2,2,sharey = ax1)
+    plt.plot(time,meand,label = 'mean down',color = 'green')
+    plt.plot(time,datad,color = 'green',alpha = 0.25)
+    plt.title('Average right hand')
+    plt.show()        
         
 numcoord =[10,11,12,13,14,15]
 numforce =[i for i in range(1,7)]
