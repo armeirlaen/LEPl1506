@@ -20,7 +20,7 @@ def find_max_loc(vc):
     threshold = np.max(vc)/7
     maxi = argrelextrema(vc, np.greater)
     keep = []
-    #print(maxi,threshold)
+    #◘print(maxi)
     for i in maxi[0]:
         if vc[i] > threshold :
             keep.append(i)
@@ -29,7 +29,7 @@ def find_max_loc(vc):
     keep = keep[1:]
     j = 0
     while j < len(keep):
-        while (keep[j] - keep[j-1] < 600) & (keep[j] - keep[j-1] >0) & (keep[j]!=0):
+        while (keep[j] - keep[j-1] < 400) & (keep[j] - keep[j-1] >0) & (keep[j]!=0):
             keep = np.delete(keep,j)
             keep = np.append(keep,0)   
         if (j < len(keep)) & (keep[j]!=0):    
@@ -39,42 +39,59 @@ def find_max_loc(vc):
             arr = vc[keep[j]-100:keep[j]]
             difference_array = np.absolute(arr-max/10)
             index = difference_array.argmin()
-            
+           
             #print(start)
             idx = index-100+keep[j]
-            keep[j] = idx
-        j+=1
+            
+            
+            arr1 = vc[keep[j]:keep[j]+100]
+            difference_array = np.absolute(arr1-max/10)
+            index1 = difference_array.argmin()
         
-    keep = keep[0:10]    
+            idx1 = index1+keep[j]
+            keep[j] = idx
+            keep = np.insert(keep,j+1,idx1)
+        j+=2
+      
+    keep = keep[0:20]    
     return keep
 
 def find_min_loc(vc):
     threshold = np.min(vc)/3
     maxi = argrelextrema(vc, np.less)
     keep = []
-    #print(maxi[0],threshold)
+    #◘print(maxi)
     for i in maxi[0]:
         if vc[i] < threshold :
             keep.append(i)
             
     keep = np.array(keep)
-    
+   
     j = 0
     while j < len(keep):
-        if (keep[j] - keep[j-1] < 600) & (keep[j] - keep[j-1] >0):
+        if (keep[j] - keep[j-1] < 400) & (keep[j] - keep[j-1] >0):
             keep = np.delete(keep,j)
         if j < len(keep):
             max = vc[keep[j]]
             #print('max:',round(max/10,1))
-            arr = vc[keep[j]-100:keep[j]]
+            arr = vc[keep[j]-75:keep[j]]
             difference_array = np.absolute(arr-max/10)
             index = difference_array.argmin()
             
             #print(start)
-            idx = index-100+keep[j]
+            idx = index-75+keep[j]
+            
+            arr1 = vc[keep[j]:keep[j]+75]
+            difference_array = np.absolute(arr1-max/10)
+            index1 = difference_array.argmin()
+            idx1 = index1+keep[j]
+            
             keep[j] = idx
-            j+=1
-    keep = keep[0:10]
+            keep = np.insert(keep,j+1,idx1)
+            
+        j+=2
+       
+    keep = keep[0:20]
     return keep
 
 def find_end(timec,timem,ac,am):
@@ -135,7 +152,7 @@ def plot_acc(glm,mc,timec,k,path):
     #az = glm['LowAcc_Z']
     Vcoda = sig.derive(Pcoda,FS_coda)
     if k in range(1,7):
-        ac = -1*sig.derive(Vcoda,FS_coda)/10000 # -1 si mani a l'envers Pour S1 à l'endroit
+        ac = 1*sig.derive(Vcoda,FS_coda)/10000 # -1 si mani a l'envers Pour S1 à l'endroit
     else :
         ac = 1*sig.derive(Vcoda,FS_coda)/10000
         
@@ -149,7 +166,7 @@ def plot_acc(glm,mc,timec,k,path):
     
     timec,timem,ac,am = find_end(timec,timem,ac,am)
     supprNan(Vcoda)
-    #idxmax,idxmin,bloc = find_mouv(Vcoda) 
+    idxmax,idxmin,bloc = find_mouv(Vcoda) 
     
     """
     plt.subplot(3,1,1)
@@ -160,10 +177,11 @@ def plot_acc(glm,mc,timec,k,path):
     plt.plot(timec,ddy)
     """
     plt.subplot(6,1,k)
-   #plt.plot(timem,am,color = 'green')
+    #plt.plot(timec,ac,color = 'green')
+    #plt.plot(timem,am)
     plt.plot(timec,Vcoda)
-    #plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
-    #plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
+    plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
+    plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
     
     
     
@@ -177,18 +195,21 @@ def find_mouv(Vcoda):
     idxmax = find_max_loc(Vcoda)
     idxmin = find_min_loc(Vcoda)
     bloc = np.zeros(idxmax.size + idxmin.size)
-    
-    #print(idxmax,idxmin,bloc)
+
     k = 0
     l = 0
-    for i in range(len(bloc)):
-        if i % 2 == 0:
+    i = 0
+    while i < len(bloc):
             bloc[i] = idxmax[k]
-            k+=1
-        if i % 2 != 0:
-            bloc[i] = idxmin[l]
-            l+=1
-    
+            bloc[i+1]=idxmax[k+1]
+            k+=2
+            bloc[i+2] = idxmin[l]
+            bloc[i+3]=idxmax[l+1]
+            l+=2
+            
+            i+=4
+            
+            
     #plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
     #plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
     #print(bloc)
