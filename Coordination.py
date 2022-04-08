@@ -20,7 +20,7 @@ def find_max_loc(vc):
     threshold = np.max(vc)/7
     maxi = argrelextrema(vc, np.greater)
     keep = []
-    #◘print(maxi)
+    #print(maxi,threshold)
     for i in maxi[0]:
         if vc[i] > threshold :
             keep.append(i)
@@ -49,10 +49,10 @@ def find_max_loc(vc):
     return keep
 
 def find_min_loc(vc):
-    threshold = np.min(vc)/3
+    threshold = np.min(vc[1000:40000])/3
     maxi = argrelextrema(vc, np.less)
     keep = []
-    #◘print(maxi)
+    #print(maxi[0],threshold)
     for i in maxi[0]:
         if vc[i] < threshold :
             keep.append(i)
@@ -74,7 +74,6 @@ def find_min_loc(vc):
             idx = index-100+keep[j]
             keep[j] = idx
             j+=1
-        
     keep = keep[0:10]
     return keep
 
@@ -178,7 +177,8 @@ def find_mouv(Vcoda):
     idxmax = find_max_loc(Vcoda)
     idxmin = find_min_loc(Vcoda)
     bloc = np.zeros(idxmax.size + idxmin.size)
-
+    
+    #print(idxmax,idxmin,bloc)
     k = 0
     l = 0
     for i in range(len(bloc)):
@@ -188,6 +188,7 @@ def find_mouv(Vcoda):
         if i % 2 != 0:
             bloc[i] = idxmin[l]
             l+=1
+    
     #plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
     #plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
     #print(bloc)

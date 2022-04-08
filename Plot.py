@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 
 import numpy as np
-
-
+import signal_processing_toolbox as sig
+import Coordination as crd
+from scipy.optimize import curve_fit
 
 def graphe_position(mc,time,file,k):
     
@@ -63,7 +64,7 @@ def plot_Gf(df,path,k):
 def plot_Gf1(df,Nsuj):
     time = df['time']
     
-    for i in range(1,13):
+    for i in range(1,2):
         GF = df['B'+str(i)]
         if i <7:
             plt.plot(time,GF,label = 'B'+str(i),alpha=0.25,color = 'red')
@@ -85,4 +86,36 @@ def LFGF(df,path,k):
     plt.plot(time,LF,label = 'LF') 
     plt.legend()
     plt.show()
+
+def func(x, a, b, c):
+    return a * np.exp(-b * x) + c
+
+def expo(df):
+    time = df['time']
     
+    for i in range(1,13):
+        GF = df['B'+str(i)]
+        Pcoda = sig.filter_signal(GF) #Filter and derive GF
+        Vcoda = sig.derive(Pcoda,200)
+        crd.supprNan(Vcoda)
+        idxmax,idxmin,bloc = crd.find_mouv(Vcoda) #Get blocs
+        
+        mean = (np.zeros(10))
+        xmean = (np.zeros(10))
+        for j in range(10): #Take mean GF of blocs
+            for x in range(idxmin[j],idxmax[j]):
+                mean[j] = mean[j] + GF[x]
+            mean[j] = mean[j]/(idxmax[j]-idxmin[j])
+            xmean[j] = time[int((idxmax[j]+idxmin[j])/2)]
+            plt.scatter(xmean[j],mean[j])
+        
+        #popt, pcov = curve_fit(func,xmean,mean)
+        #tiltles = str(popt[0])+" * e**"+str(popt[1])+" + "+str(popt[2])
+        #plt.plot(xmean, func(xmean, *popt), label=tiltles)
+        
+        if i <7:
+            plt.plot(time,GF,label = 'B'+str(i),alpha=0.25,color = 'red')
+            plt.show()
+        else :
+            plt.plot(time,GF,label = 'B'+str(i),alpha=0.25,color = 'green')
+            plt.show()

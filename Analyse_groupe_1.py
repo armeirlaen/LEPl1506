@@ -123,14 +123,15 @@ numforce =[i for i in range(1,7)]
 marker_manipulandum = [4,5,6,7]
 
 
-Nsuj = 2
+Nsuj = 1
 
 
 
-#df_GF = allFor1Sujet(('LFt'),Nsuj)
+df_GF = allFor1Sujet(('LFt'),Nsuj)
 #averageSensMain(df_GF)
 #pl.plot_Gf1(df_GF,Nsuj)
 
+pl.expo(df_GF)
 
 
 def sujBySuj():
@@ -173,4 +174,4 @@ def sujBySuj():
             crd.coordination(df_glm,df_coda,mc,k,path)
             #print(i)
             
-sujBySuj()   
+#sujBySuj()   
