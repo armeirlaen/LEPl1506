@@ -204,7 +204,7 @@ def find_mouv(Vcoda):
             bloc[i+1]=idxmax[k+1]
             k+=2
             bloc[i+2] = idxmin[l]
-            bloc[i+3]=idxmax[l+1]
+            bloc[i+3]=idxmin[l+1]
             l+=2
             
             i+=4

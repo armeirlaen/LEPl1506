@@ -88,7 +88,7 @@ def LFGF(df,path,k):
     plt.show()
 
 def func(x, a, b, c): # simple quadratic example
-    return a + b*np.log(x) + c*np.log(x)**2
+    return a*x**2 + b*x + c
 
 def expo(mc,df):
     time = df['time']
@@ -99,8 +99,8 @@ def expo(mc,df):
     crd.supprNan(Vcoda)
     #plt.plot(Vcoda)
     idxmax,idxmin,bloc = crd.find_mouv(Vcoda) #Get blocs
+    plt.figure(1)
     
-    print(bloc)
     centering = len(nGF)/len(Vcoda)
     mean = (np.zeros(10))
     xmean = (np.zeros(10))
@@ -114,9 +114,19 @@ def expo(mc,df):
         plt.scatter(xmean[k],mean[k])
     
     popt, pcov = curve_fit(func,xmean,mean)
-    tiltles = str(popt[0])+" * e**"+str(popt[1])+" + "+str(popt[2])
+    tiltles = str(popt[0])+" * x**2 "+str(popt[1])+" * x + "+str(popt[2])
     plt.plot(xmean, func(xmean, *popt), label=tiltles)
-    
-    print(popt)
+    plt.title(tiltles)
+    print(bloc)
     plt.plot(time,nGF,label = 'GF',alpha=0.25,color = 'red')
     plt.show()
+    
+    plt.figure(2)
+    nxaxis = (np.zeros(10))
+    for i in range(10):
+        nxaxis[i] = i
+    popt, pcov = curve_fit(func,nxaxis,mean)
+    plt.scatter(nxaxis,mean)
+    plt.plot(nxaxis, func(nxaxis, *popt))
+    #plt.show()
+    return pcov[0]
