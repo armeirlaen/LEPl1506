@@ -87,35 +87,36 @@ def LFGF(df,path,k):
     plt.legend()
     plt.show()
 
-def func(x, a, b, c):
-    return a * np.exp(-b * x) + c
+def func(x, a, b, c): # simple quadratic example
+    return a + b*np.log(x) + c*np.log(x)**2
 
-def expo(df):
+def expo(mc,df):
     time = df['time']
     
-    for i in range(1,13):
-        GF = df['B'+str(i)]
-        Pcoda = sig.filter_signal(GF) #Filter and derive GF
-        Vcoda = sig.derive(Pcoda,200)
-        crd.supprNan(Vcoda)
-        idxmax,idxmin,bloc = crd.find_mouv(Vcoda) #Get blocs
-        
-        mean = (np.zeros(10))
-        xmean = (np.zeros(10))
-        for j in range(10): #Take mean GF of blocs
-            for x in range(idxmin[j],idxmax[j]):
-                mean[j] = mean[j] + GF[x]
-            mean[j] = mean[j]/(idxmax[j]-idxmin[j])
-            xmean[j] = time[int((idxmax[j]+idxmin[j])/2)]
-            plt.scatter(xmean[j],mean[j])
-        
-        #popt, pcov = curve_fit(func,xmean,mean)
-        #tiltles = str(popt[0])+" * e**"+str(popt[1])+" + "+str(popt[2])
-        #plt.plot(xmean, func(xmean, *popt), label=tiltles)
-        
-        if i <7:
-            plt.plot(time,GF,label = 'B'+str(i),alpha=0.25,color = 'red')
-            plt.show()
-        else :
-            plt.plot(time,GF,label = 'B'+str(i),alpha=0.25,color = 'green')
-            plt.show()
+    nGF = df['GF'] #Filter and derive x
+    #plt.plot(mc[1])
+    Vcoda = sig.derive(mc[1],200)
+    crd.supprNan(Vcoda)
+    #plt.plot(Vcoda)
+    idxmax,idxmin,bloc = crd.find_mouv(Vcoda) #Get blocs
+    
+    print(bloc)
+    centering = len(nGF)/len(Vcoda)
+    mean = (np.zeros(10))
+    xmean = (np.zeros(10))
+    k=-1
+    for j in range(0,20,2): #Take mean GF of blocs
+        k=k+1
+        for x in range(int(bloc[j]),int(bloc[j+1])):
+            mean[k] = mean[k] + nGF[int(x*centering)]
+        mean[k] = mean[k]/(bloc[j+1]-bloc[j])
+        xmean[k] = time[int((bloc[j+1]*centering+bloc[j]*centering)/2)]
+        plt.scatter(xmean[k],mean[k])
+    
+    popt, pcov = curve_fit(func,xmean,mean)
+    tiltles = str(popt[0])+" * e**"+str(popt[1])+" + "+str(popt[2])
+    plt.plot(xmean, func(xmean, *popt), label=tiltles)
+    
+    print(popt)
+    plt.plot(time,nGF,label = 'GF',alpha=0.25,color = 'red')
+    plt.show()

@@ -49,7 +49,7 @@ def find_max_loc(vc):
     return keep
 
 def find_min_loc(vc):
-    threshold = np.min(vc[1000:40000])/3
+    threshold = np.min(vc)/3
     maxi = argrelextrema(vc, np.less)
     keep = []
     #print(maxi[0],threshold)

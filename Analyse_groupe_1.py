@@ -131,11 +131,11 @@ df_GF = allFor1Sujet(('LFt'),Nsuj)
 #averageSensMain(df_GF)
 #pl.plot_Gf1(df_GF,Nsuj)
 
-pl.expo(df_GF)
+
 
 
 def sujBySuj():
-    for Nsuj in [3]: #1,2,3,5,6
+    for Nsuj in [2]: #1,2,3,5,6
     
     
         strpath = "S"+str(Nsuj)+"_0" #"GBIO_2022_Group_1_S"+Nsuj+"_202200008_0" pourS1,S2,S3,S4
@@ -167,11 +167,13 @@ def sujBySuj():
                              sep = ',', 
                              header = 0
                              )
+            pl.expo(mc,df_glm)
             #print(df_coda['Marker7_X'])
             #pl.plot_Gf(df_glm,path1,k)
             #pl.graphe_position(mc,df_coda.timec,path,k)
             #pl.LFGF(df_glm,path1,k)
-            crd.coordination(df_glm,df_coda,mc,k,path)
+            #crd.coordination(df_glm,df_coda,mc,k,path)
             #print(i)
             
-#sujBySuj()   
+            
+sujBySuj()   
