@@ -27,9 +27,10 @@ def find_max_loc(vc):
             
     keep = np.array(keep)
     keep = keep[1:]
+    
     j = 0
     while j < len(keep):
-        while (keep[j] - keep[j-1] < 400) & (keep[j] - keep[j-1] >0) & (keep[j]!=0):
+        while (keep[j] - keep[j-2] < 400) & (keep[j] - keep[j-2] >0) & (keep[j]!=0):
             keep = np.delete(keep,j)
             keep = np.append(keep,0)   
         if (j < len(keep)) & (keep[j]!=0):    
@@ -52,8 +53,9 @@ def find_max_loc(vc):
             keep[j] = idx
             keep = np.insert(keep,j+1,idx1)
         j+=2
-      
-    keep = keep[0:20]    
+
+    keep = keep[0:20] 
+   
     return keep
 
 def find_min_loc(vc):
@@ -66,11 +68,14 @@ def find_min_loc(vc):
             keep.append(i)
             
     keep = np.array(keep)
-   
+    
     j = 0
     while j < len(keep):
-        if (keep[j] - keep[j-1] < 400) & (keep[j] - keep[j-1] >0):
+        
+        if (keep[j] - keep[j-2] < 400) & (keep[j] - keep[j-2] >0):
+           
             keep = np.delete(keep,j)
+            
         if j < len(keep):
             max = vc[keep[j]]
             #print('max:',round(max/10,1))
@@ -90,7 +95,7 @@ def find_min_loc(vc):
             keep = np.insert(keep,j+1,idx1)
             
         j+=2
-       
+      
     keep = keep[0:20]
     return keep
 
@@ -194,22 +199,24 @@ def plot_acc(glm,mc,timec,k,path):
 def find_mouv(Vcoda):
     idxmax = find_max_loc(Vcoda)
     idxmin = find_min_loc(Vcoda)
-    bloc = np.zeros(idxmax.size + idxmin.size)
+    print(idxmin,idxmax)
+    bloc = np.concatenate((idxmax,idxmin))
 
     k = 0
     l = 0
     i = 0
+    """
     while i < len(bloc):
             bloc[i] = idxmax[k]
             bloc[i+1]=idxmax[k+1]
             k+=2
             bloc[i+2] = idxmin[l]
-            bloc[i+3]=idxmin[l+1]
+            bloc[i+3]=  idxmin[l+1]
             l+=2
             
             i+=4
             
-            
+    """        
     #plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
     #plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
     #print(bloc)
