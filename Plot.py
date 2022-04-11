@@ -88,7 +88,7 @@ def LFGF(df,path,k):
     plt.show()
 
 def func(x, a, b, c): # simple quadratic example
-    return a*x**2 + b*x + c
+    return a*(x**2) + b*x +c
 
 def expo(mc,df,df_coda,nb):
     time = df['time']
