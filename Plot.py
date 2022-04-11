@@ -90,36 +90,48 @@ def LFGF(df,path,k):
 def func(x, a, b, c): # simple quadratic example
     return a*x**2 + b*x + c
 
-def expo(mc,df):
+def expo(mc,df,df_coda,nb):
     time = df['time']
     
     nGF = df['GF'] #Filter and derive x
-    #plt.plot(mc[1])
+    Vcoda = sig.derive(mc[1],200)
+    ac = 1*sig.derive(Vcoda,200)/10000
+    
+    am = sig.filter_signal(df['LowAcc_X'])
+    
+    crd.supprNan(ac)
+    crd.supprNan(am)
+    
     Vcoda = sig.derive(mc[1],200)
     crd.supprNan(Vcoda)
-    #plt.plot(Vcoda)
     idxmax,idxmin,bloc = crd.find_mouv(Vcoda) #Get blocs
+    
     plt.figure(1)
     
+    timec,time,ac,am = crd.find_end(df_coda.timec,time,ac,am)
+
+    time = df['time']
     centering = len(nGF)/len(Vcoda)
     mean = (np.zeros(10))
     xmean = (np.zeros(10))
     k=-1
     for j in range(0,20,2): #Take mean GF of blocs
         k=k+1
-        for x in range(int(bloc[j]),int(bloc[j+1])):
-            mean[k] = mean[k] + nGF[int(x*centering)]
-        mean[k] = mean[k]/(bloc[j+1]-bloc[j])
-        xmean[k] = time[int((bloc[j+1]*centering+bloc[j]*centering)/2)]
+        ind1 = np.where(time == timec[bloc[j]])[0][0]
+        ind2 = np.where(time == timec[bloc[j+1]])[0][0]
+        for x in range(ind1,ind2):
+            mean[k] = mean[k] + nGF[x]
+        mean[k] = mean[k]/(ind2-ind1)
+        xmean[k] = time[ind1]+(time[ind2]-time[ind1])/2
         plt.scatter(xmean[k],mean[k])
     
     popt, pcov = curve_fit(func,xmean,mean)
     tiltles = str(popt[0])+" * x**2 "+str(popt[1])+" * x + "+str(popt[2])
-    plt.plot(xmean, func(xmean, *popt), label=tiltles)
-    plt.title(tiltles)
-    print(bloc)
+    plt.plot(xmean, func(xmean, *popt), label=str(nb))
+    #plt.title(tiltles)
     plt.plot(time,nGF,label = 'GF',alpha=0.25,color = 'red')
-    plt.show()
+    plt.legend()
+    #plt.show()
     
     plt.figure(2)
     nxaxis = (np.zeros(10))
@@ -127,6 +139,7 @@ def expo(mc,df):
         nxaxis[i] = i
     popt, pcov = curve_fit(func,nxaxis,mean)
     plt.scatter(nxaxis,mean)
-    plt.plot(nxaxis, func(nxaxis, *popt))
+    plt.plot(nxaxis, func(nxaxis, *popt), label=str(nb))
     #plt.show()
+    plt.legend()
     return pcov[0]
