@@ -106,27 +106,61 @@ def averageSensMain(dfs):
     meandownd= np.mean(datadownd,1)
     meanupg = np.mean(dataupg,1)
     meandowng= np.mean(datadowng,1)
+    
+    mupd1 = np.full(time.shape,np.mean(dataup[:,1]))
+    mupd2 = np.full(time.shape,np.mean(dataup[:,3]))
+    mupd3 = np.full(time.shape,np.mean(dataup[:,5]))
+    
+    mupg1 = np.full(time.shape,np.mean(dataup[:,0]))
+    mupg2 = np.full(time.shape,np.mean(dataup[:,2]))
+    mupg3 = np.full(time.shape,np.mean(dataup[:,4]))
+    
+    mdwd1 = np.full(time.shape,np.mean(datadown[:,1]))
+    mdwd2 = np.full(time.shape,np.mean(datadown[:,3]))
+    mdwd3 = np.full(time.shape,np.mean(datadown[:,5]))
+    
+    mdwg1 = np.full(time.shape,np.mean(datadown[:,0]))
+    mdwg2 = np.full(time.shape,np.mean(datadown[:,2]))
+    mdwg3 = np.full(time.shape,np.mean(datadown[:,4]))
+    
+    
     ax1 = plt.subplot(2,2,1)
     plt.plot(time,meanupg,label = 'mean up left',color = 'orange')
     plt.plot(time,dataupg,color = 'orange',alpha = 0.25)
+    plt.plot(time,mupg1,color = 'blue',alpha = 0.50,label = 'mean of bloc 1 ='+str(mupg1[0]))
+    plt.plot(time,mupg2,color = 'green',alpha = 0.50,label = 'mean of bloc 2 ='+str(mupg2[0]))
+    plt.plot(time,mupg3,color = 'red',alpha = 0.50,label = 'mean of bloc 3 ='+str(mupg3[0]))
+    plt.legend()
     plt.title('Average upside left hand')
     
     plt.subplot(2,2,2,sharey = ax1)
     plt.plot(time,meanupd,label = 'mean up right',color = 'red')
     plt.plot(time,dataupd,color = 'red',alpha = 0.25)
+    plt.plot(time,mupd1,color = 'blue',alpha = 0.50,label = 'mean of bloc 1 ='+str(mupd1[0]))
+    plt.plot(time,mupd2,color = 'green',alpha = 0.50,label = 'mean of bloc 2 ='+str(mupd2[0]))
+    plt.plot(time,mupd3,color = 'orange',alpha = 0.50,label = 'mean of bloc 3 ='+str(mupd3[0]))
+    plt.legend()
     plt.title('Average upside right hand')
     
     plt.subplot(2,2,3,sharey = ax1)
     plt.plot(time,meandowng,label = 'mean down left',color = 'blue')
     plt.plot(time,datadowng,color = 'blue',alpha = 0.25)
+    plt.plot(time,mdwg1,color = 'red',alpha = 0.50,label = 'mean of bloc 1 ='+str(mdwg1[0]))
+    plt.plot(time,mdwg2,color = 'green',alpha = 0.50,label = 'mean of bloc 2 ='+str(mdwg2[0]))
+    plt.plot(time,mdwg3,color = 'orange',alpha = 0.50,label = 'mean of bloc 3 ='+str(mdwg3[0]))
+    plt.legend()
     plt.title('Average downside left hand')
     
     
     plt.subplot(2,2,4,sharey = ax1)
     plt.plot(time,meandownd,label = 'mean down right',color = 'green')
     plt.plot(time,datadownd,color = 'green',alpha = 0.25)
+    plt.plot(time,mdwd1,color = 'red',alpha = 0.50,label = 'mean of bloc 1 ='+str(mdwd1[0]))
+    plt.plot(time,mdwd2,color = 'blue',alpha = 0.50,label = 'mean of bloc 2 ='+str(mdwd2[0]))
+    plt.plot(time,mdwd3,color = 'orange',alpha = 0.50,label = 'mean of bloc 3 ='+str(mdwd3[0]))
     plt.title('Average downside right hand')
-    plt.show()    
+    plt.legend()
+    plt.show()     
 
 def averageMain(dfs):
     time = dfs['time']
