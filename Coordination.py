@@ -106,7 +106,7 @@ def find_end(timec,timem,ac,am):
     
     maxm = np.max(am[30000:])
     idxm = np.where(am[30000:] == maxm)
-    print(idxc,maxc,idxm,maxm)
+    #print(idxc,maxc,idxm,maxm)
     if len(idxc[0]) == 1:
         endc = float(timec[idxc[0]])
         endm = float(timem[idxm[0]+30000])
@@ -199,7 +199,6 @@ def plot_acc(glm,mc,timec,k,path):
 def find_mouv(Vcoda):
     idxmax = find_max_loc(Vcoda)
     idxmin = find_min_loc(Vcoda)
-    print(idxmin,idxmax)
     bloc = np.concatenate((idxmax,idxmin))
 
     k = 0

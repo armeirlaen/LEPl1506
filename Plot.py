@@ -105,8 +105,7 @@ def expo(mc,df,df_coda,nb):
     Vcoda = sig.derive(mc[1],200)
     crd.supprNan(Vcoda)
     idxmax,idxmin,bloc = crd.find_mouv(Vcoda) #Get blocs
-    
-    plt.figure(1)
+    #plt.figure(1)
     
     timec,time,ac,am = crd.find_end(df_coda.timec,time,ac,am)
 
@@ -117,29 +116,49 @@ def expo(mc,df,df_coda,nb):
     k=-1
     for j in range(0,20,2): #Take mean GF of blocs
         k=k+1
-        ind1 = np.where(time == timec[bloc[j]])[0][0]
-        ind2 = np.where(time == timec[bloc[j+1]])[0][0]
+        if timec[bloc[j+1]]<51.5:
+            ind1 = np.where(time == timec[bloc[j]])[0]
+            ind2 = np.where(time == timec[bloc[j+1]])[0]
+            if len(ind1)!=0:
+                ind1 = ind1[0]
+            else:
+                ind1 = np.where(time == int(timec[bloc[j]]))[0][0]
+            if len(ind2)!=0:
+                ind2 = ind2[0]
+            else:
+                ind2 = np.where(time == int(timec[bloc[j+1]]))[0][0]
+        else:
+            ind1 = np.where(time == timec[bloc[j]]-1)[0]
+            ind2 = np.where(time == timec[bloc[j+1]]-1)[0]
+            if len(ind1)!=0:
+                ind1 = ind1[0]
+            else:
+                ind1 = np.where(time == int(timec[bloc[j]]-1))[0][0]
+            if len(ind2)!=0:
+                ind2 = ind2[0]
+            else:
+                ind2 = np.where(time == int(timec[bloc[j+1]]-1))[0][0]
         for x in range(ind1,ind2):
             mean[k] = mean[k] + nGF[x]
         mean[k] = mean[k]/(ind2-ind1)
         xmean[k] = time[ind1]+(time[ind2]-time[ind1])/2
-        plt.scatter(xmean[k],mean[k])
+        #plt.scatter(xmean[k],mean[k])
     
-    popt, pcov = curve_fit(func,xmean,mean)
-    tiltles = str(popt[0])+" * x**2 "+str(popt[1])+" * x + "+str(popt[2])
-    plt.plot(xmean, func(xmean, *popt), label=str(nb))
+    #popt, pcov = curve_fit(func,xmean,mean)
+    #tiltles = str(popt[0])+" * x**2 "+str(popt[1])+" * x + "+str(popt[2])
+    #plt.plot(xmean, func(xmean, *popt), label=str(nb))
     #plt.title(tiltles)
-    plt.plot(time,nGF,label = 'GF',alpha=0.25,color = 'red')
-    plt.legend()
+    #plt.plot(time,nGF,label = 'GF',alpha=0.25,color = 'red')
+    #plt.legend()
     #plt.show()
     
-    plt.figure(2)
-    nxaxis = (np.zeros(10))
-    for i in range(10):
-        nxaxis[i] = i
-    popt, pcov = curve_fit(func,nxaxis,mean)
-    plt.scatter(nxaxis,mean)
-    plt.plot(nxaxis, func(nxaxis, *popt), label=str(nb))
+    #plt.figure(2)
+    #nxaxis = (np.zeros(10))
+    #for i in range(10):
+    #    nxaxis[i] = i
+    #popt, pcov = curve_fit(func,nxaxis,mean)
+    #plt.scatter(nxaxis,mean)
+    #plt.plot(nxaxis, func(nxaxis, *popt), label=str(nb))
     #plt.show()
-    plt.legend()
-    return pcov[0]
+    #plt.legend()
+    return mean
