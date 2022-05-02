@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import Coordination as crd
 from sklearn.linear_model import LinearRegression
 from scipy.optimize import curve_fit
+import scipy.stats
 """
 Partie du code sur les fichier du manipulandum(.glm)
 
@@ -221,19 +222,33 @@ xaxis = np.array([j for j in range(1,11)])
 def func(x, a, b, c): # simple quadratic example
     return a*(x) + b
 
+Ttest1 = [i for i in range(10)]
+Ttest2 = [i for i in range(10)]
+t = 0
+
 stock1 = np.zeros(10)
 stock2 = np.zeros(10)
 for i in [1,2,3,5,6]:
     right,left = sujBySuj(i,numforce)
     plt.subplot(2, 1, 1)
-    plt.scatter(xaxis,right,label='GHU Subject'+str(i))
+    plt.scatter(xaxis,right,label='Dominant hand subject'+str(i))
     plt.legend()
 
     plt.subplot(2, 1, 2)
-    plt.scatter(xaxis,left,label='BHU Subject'+str(i))
+    plt.scatter(xaxis,left,label='Non-Dominant hand subject'+str(i))
+    plt.title("GF up")
+    plt.ylabel("GF (N)")
     plt.legend()
     stock1+=right
     stock2+=left
+    
+    xaxis = xaxis.reshape((-1, 1))
+    right = np.array(right).reshape((-1, 1))
+    left = np.array(left).reshape((-1, 1))
+    Ttest1[t] = (LinearRegression().fit(xaxis, right)).coef_
+    Ttest2[t] = (LinearRegression().fit(xaxis, left)).coef_
+    t=t+1
+    xaxis = np.array([j for j in range(1,11)])
 
 xaxis = xaxis.reshape((-1, 1))
 
@@ -241,16 +256,22 @@ stock1=np.array(stock1/6).reshape((-1, 1))
 stock2=np.array(stock2/6).reshape((-1, 1))
 
 model1 = LinearRegression().fit(xaxis, stock1)
-print(model1.coef_)
 stock1 = model1.predict(xaxis)
 plt.subplot(2, 1, 1)
-plt.plot(xaxis, stock1,label='Lin Reg')
+plt.plot(xaxis, stock1)
+plt.scatter(xaxis, stock1,label = 'Linear regression')
 model2 = LinearRegression().fit(xaxis, stock2)
 stock2 = model2.predict(xaxis)
-print(stock2)
 plt.subplot(2, 1, 2)
 plt.plot(xaxis, stock2)
+plt.scatter(xaxis, stock2)
+print(model1.coef_,model2.coef_)
+plt.title("GF up")
+plt.ylabel("GF (N)")
+plt.xlabel("Mouvements")
 plt.show()
+
+    
 
 stock1 = np.zeros(10)
 stock2 = np.zeros(10)
@@ -258,25 +279,71 @@ numforce =[i for i in down]
 for i in [1,2,3,5,6]:
     right,left = sujBySuj(i,numforce)
     plt.subplot(2, 1, 1)
-    plt.scatter(xaxis,right,label='GHD Subject'+str(i))
+    plt.scatter(xaxis,right,label='Dominant hand subject'+str(i))
     plt.legend()
 
     plt.subplot(2, 1, 2)
-    plt.scatter(xaxis,left,label='BHD Subject'+str(i))
+    plt.scatter(xaxis,left,label='Non-Dominant hand subject'+str(i))
     plt.legend()
-    print(stock2)
     crd.supprNan(stock2)
     stock1+=right
     stock2+=left
+    
+    xaxis = xaxis.reshape((-1, 1))
+    right = np.array(right).reshape((-1, 1))
+    left = np.array(left).reshape((-1, 1))
+    Ttest1[t] = (LinearRegression().fit(xaxis, right)).coef_
+    Ttest2[t] = (LinearRegression().fit(xaxis, left)).coef_
+    t=t+1
+    xaxis = np.array([j for j in range(1,11)])
 
 stock1=np.array(stock1/6).reshape((-1, 1))
 stock2=np.array(stock2/6).reshape((-1, 1))
+xaxis = xaxis.reshape((-1, 1))
+
+
 model1 = LinearRegression().fit(xaxis, stock1)
 stock1 = model1.predict(xaxis)
 plt.subplot(2, 1, 1)
 plt.plot(xaxis, stock1)
+plt.scatter(xaxis, stock1)
 model2 = LinearRegression().fit(xaxis, stock2)
 stock2 = model2.predict(xaxis)
 plt.subplot(2, 1, 2)
 plt.plot(xaxis, stock2)
+plt.scatter(xaxis, stock2)
+print(model1.coef_,model2.coef_)
+plt.title("GF down")
+plt.ylabel("GF (N)")
+plt.xlabel("Mouvements")
 plt.show()
+
+
+for i in range(10):
+    Ttest1[i] = Ttest1[i][0][0]
+for i in range(10):
+    Ttest2[i] = Ttest2[i][0][0]
+
+upDom = Ttest1[0:5]
+upNonDom = Ttest1[5:10]
+downDom = Ttest2[0:5]
+downNonDom = Ttest2[5:10]
+datanp = np.array([upDom,upNonDom,downDom,downNonDom])
+print(upDom, upNonDom, downDom, downNonDom)
+print("LESS:")
+print("Rel up",scipy.stats.ttest_rel(upDom, upNonDom,alternative='less'))
+print("Rel down",scipy.stats.ttest_rel(downDom, downNonDom,alternative='less'))
+
+print("GREATER")
+print("Rel up",scipy.stats.ttest_rel(upDom, upNonDom,alternative='greater'))
+print("Rel down",scipy.stats.ttest_rel(downDom, downNonDom,alternative='greater'))
+
+
+data = pd.DataFrame({'upg':datanp[0],'upb':datanp[1],'dwg':datanp[2],'dwb':datanp[3]})
+data1 = pd.DataFrame({'Up':np.concatenate((datanp[0],datanp[1])),'Down':np.concatenate((datanp[2],datanp[3]))})
+data2 = pd.DataFrame({'GH':np.concatenate((datanp[0],datanp[2])),'BH':np.concatenate((datanp[1],datanp[3]))})
+data3 = pd.DataFrame({'Dup': datanp[0]-datanp[2],'Ddw':datanp[1]-datanp[3]})
+print(data2)
+fit = statsmodels.formula.api.ols('Dup ~ Ddw ', data3).fit()
+table = statsmodels.api.stats.anova_lm(fit)
+print('Test anova H0 : [GF_ MD - GF_MnD]up = GF_MD - GF_MnD]down \n',table)

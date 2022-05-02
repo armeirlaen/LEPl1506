@@ -93,7 +93,7 @@ def func(x, a, b, c): # simple quadratic example
 def expo(mc,df,df_coda,nb):
     time = df['time']
     
-    nGF = df['GF'] #Filter and derive x
+    nGF = df['LFt'] #Filter and derive x
     Vcoda = sig.derive(mc[1],200)
     ac = 1*sig.derive(Vcoda,200)/10000
     
@@ -161,4 +161,5 @@ def expo(mc,df,df_coda,nb):
     #plt.plot(nxaxis, func(nxaxis, *popt), label=str(nb))
     #plt.show()
     #plt.legend()
+    crd.supprNan(mean)
     return mean
