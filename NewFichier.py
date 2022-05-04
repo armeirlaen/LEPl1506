@@ -5,7 +5,7 @@ import pandas as pd
 for Nsuj in [1,2,3,5,6]:
     for j in [1,2,3,4,5,6,7,8,9,10,11,12]:
         
-        #if j <10 :
+        if j <10 :
             path = "GLM/S"+str(Nsuj)+"_00"+str(j)+".txt"
         else :
             path = "GLM/S"+str(Nsuj)+"_0"+str(j)+".txt"
@@ -14,9 +14,10 @@ for Nsuj in [1,2,3,5,6]:
 
         df = pd.read_csv(path,header = 0)
         #fd2 = glm.import_data(path2)
-        base = df.GF[0]
-        for i in range(len(df.GF)):
-            df.GF[i] -= base
+        base = df.LowAcc_X[0]
+        for i in range(len(df.LowAcc_X)):
+            df.LowAcc_X[i] -= base
+        #print(df['LowAcc_X'])
         """
         #df.drop(columns=["Marker1_Visibility", "Marker2_Visibility","Marker3_Visibility",'Marker4_Visibility','Marker5_Visibility',
                          'Marker4_Visibility','Marker5_Visibility','Marker6_Visibility','Marker7_Visibility','Marker8_Visibility',
@@ -28,16 +29,15 @@ for Nsuj in [1,2,3,5,6]:
                            'Marker6_X' : 'Marker5_X','Marker6_Y' : 'Marker5_Y','Marker6_Z' : 'Marker5_Z',
                            'Marker7_X' : 'Marker6_X','Marker7_Y' : 'Marker6_Y','Marker7_Z' : 'Marker6_Z',
                            'Marker8_X' : 'Marker7_X','Marker8_Y' : 'Marker7_Y','Marker8_Z' : 'Marker7_Z'}, inplace = True)
-
-
         """
-        #print(df['GF'])
+
+        
+        #
         
         if j < 10:
             df.to_csv("GLM/S"+str(Nsuj)+"_00"+str(j)+".txt",header  = True,index = False)
         else :
             df.to_csv("GLM/S"+str(Nsuj)+"_0"+str(j)+".txt",header  = True,index = False)
-
 
 #file = open("Coda/S1_002.txt",'w')
 #file.write(df.to_string())

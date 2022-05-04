@@ -30,7 +30,7 @@ def find_max_loc(vc):
     
     j = 0
     while j < len(keep):
-        while (keep[j] - keep[j-2] < 400) & (keep[j] - keep[j-2] >0) & (keep[j]!=0):
+        while (keep[j] - keep[j-2] < 500) & (keep[j] - keep[j-2] >0) & (keep[j]!=0):
             keep = np.delete(keep,j)
             keep = np.append(keep,0)   
         if (j < len(keep)) & (keep[j]!=0):    
@@ -72,7 +72,7 @@ def find_min_loc(vc):
     j = 0
     while j < len(keep):
         
-        if (keep[j] - keep[j-2] < 400) & (keep[j] - keep[j-2] >0):
+        if (keep[j] - keep[j-2] < 500) & (keep[j] - keep[j-2] >0):
            
             keep = np.delete(keep,j)
             
@@ -181,20 +181,26 @@ def plot_acc(glm,mc,timec,k,path):
     plt.subplot(3,1,3)
     plt.plot(timec,ddy)
     """
-    plt.subplot(6,1,k)
+    ax = plt.subplot(2,1,1)
     #plt.plot(timec,ac,color = 'green')
     #plt.plot(timem,am)
+    plt.plot(timec,Pcoda)
+    plt.scatter(timec[idxmax],Pcoda[idxmax],color = 'red')
+    plt.scatter(timec[idxmin],Pcoda[idxmin],color = 'green')
+    plt.title('Separtion of the mouvements')
+    plt.ylabel('Position [mm]')
+    
+    plt.subplot(2,1,2,sharex = ax)
     plt.plot(timec,Vcoda)
     plt.scatter(timec[idxmax],Vcoda[idxmax],color = 'red')
-    plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green') 
-    
-    
+    plt.scatter(timec[idxmin],Vcoda[idxmin],color = 'green')       
+    plt.xlabel('Time [s]')
+    plt.ylabel('Vitesse [mm/s]')
+    plt.show()
     
    
-    if k == 6 :
-        plt.title(path)
-        plt.legend(['Manipulandum','CODA'],loc = 'upper left')
-        plt.show()
+        
+        
         
 def find_mouv(Vcoda):
     idxmax = find_max_loc(Vcoda)
@@ -224,3 +230,15 @@ def find_mouv(Vcoda):
 def coordination(df_glm,df_coda,mc,k,path):
     timec = df_coda.timec
     plot_acc(df_glm,mc,timec,k,path)
+
+def cut(df_glm,df_coda,mc):
+    Pcoda = sig.filter_signal(mc[1])
+    Vcoda = sig.derive(Pcoda,FS_coda)
+    supprNan(Vcoda)
+    timec = df_coda.timec
+    timeg = df_glm.time
+    idxmax,idxmin,bloc = find_mouv(Vcoda)
+    idx1 = idxmax[0]*int(len(timeg)/len(timec))
+    idx2 = idxmin[-1]*int(len(timeg)/len(timec))
+    
+    return(idx1,idx2)
